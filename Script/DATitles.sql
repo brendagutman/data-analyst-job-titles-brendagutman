@@ -63,32 +63,38 @@ the average rating for the state as avg_rating. Which state shows the highest av
 
 /* 9 Q. Find the name of each company and its average star rating for all companies that have more than 5000 
 reviews across all locations. How many companies are there with more that 5000 reviews across all locations?*/
--- 9 A. 184
+-- 9 A. 1793
+
 /*
- 	SELECT company , AVG(star_rating)
-	FROM data_analyst_jobs
- 	WHERE review_count > 5000 AND company IS NOT NULL
-	GROUP BY company
-*/
-/*
- 	SELECT COUNT(company)
-	FROM data_analyst_jobs
- 	WHERE review_count > 5000 AND company IS NOT NULL
-*/
+	SELECT company, avg_star_rating , (SELECT COUNT(*) AS num_o_companies
+									   	FROM data_analyst_jobs
+									  	HAVING sum(review_count) >= 5000)
+	FROM 
+ 		(SELECT company, ROUND(AVG(star_rating),2) AS avg_star_rating, SUM(review_count) AS sum_review_count
+		FROM data_analyst_jobs 
+		WHERE review_count >= 5000 AND company IS NOT NULL
+ 		GROUP BY company) sub
+	GROUP BY 1,2
+*/	
 
 /* 10 Q. Add the code to order the query in #9 from highest to lowest average star rating. Which company 
 with more than 5000 reviews across all locations in the dataset has the highest star rating? What is that rating?*/
--- 10 A. Burlington Stores 3.40
+-- 10 A. American Express 4.2
 /*
-	SELECT company , AVG(star_rating) AS avg_rating
-	FROM data_analyst_jobs
- 	WHERE review_count > 5000 AND company IS NOT NULL
-	GROUP BY company
-	ORDER BY avg_rating
+	SELECT company, avg_star_rating , (SELECT COUNT(*) AS num_o_companies
+									   	FROM data_analyst_jobs
+									  	HAVING sum(review_count) >= 5000)
+	FROM 
+ 		(SELECT company, ROUND(AVG(star_rating),2) AS avg_star_rating, SUM(review_count) AS sum_review_count
+		FROM data_analyst_jobs 
+		WHERE review_count >= 5000 AND company IS NOT NULL
+ 		GROUP BY company) sub
+	GROUP BY 1,2
+	ORDER BY avg_star_rating desc
 */
 
 -- 11 Q. Find all the job titles that contain the word ‘Analyst’. How many different job titles are there?
--- 11 A. 1669 when using ILIKE - case insensitive 
+-- 11 A. 1669 
 /*
 	SELECT COUNT(title)
 	FROM data_analyst_jobs
